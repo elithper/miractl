@@ -27,8 +27,7 @@ KERNEL=="hidraw*", ATTRS{idVendor}=="0416", ATTRS{idProduct}=="5020", MODE="0666
 ```
 Finally, reload your udev rules.
 
-`sudo udevadm control --reload-rules`
-`sudo udevadm trigger`
+`sudo udevadm control --reload-rules && sudo udevadm trigger`
 
 ## Usage
 
