@@ -5,7 +5,6 @@ import usb.util
 
 vid = 0x0416
 pid = 0x5020
-reattach = False
 
 # Create list of all Boox Mira devices
 device_list = usb.core.find(idVendor=vid, idProduct=pid, find_all=True)
@@ -15,12 +14,8 @@ for dev in device_list:
     dev.reset()
     
     if dev.is_kernel_driver_active(0):
-        reattach = True
         dev.detach_kernel_driver(0)
     
     dev.set_configuration()
     
     dev.write(1, '\x01', 0)
-    
-    if reattach:
-        dev.attach_kernel_driver(0)
