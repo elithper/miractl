@@ -9,13 +9,17 @@ pid = 0x5020
 # Create list of all Boox Mira devices
 device_list = usb.core.find(idVendor=vid, idProduct=pid, find_all=True)
 
-# Iterate through device list and refresh sequentially
-for dev in device_list:
+def refresh(dev):
     dev.reset()
-    
     if dev.is_kernel_driver_active(0):
         dev.detach_kernel_driver(0)
-    
     dev.set_configuration()
-    
     dev.write(1, '\x01', 0)
+
+def main():
+    # Iterate through device list and refresh sequentially
+    for dev in device_list:
+        refresh(dev)
+
+if __name__ == "__main__":
+    main()
