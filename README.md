@@ -1,6 +1,6 @@
 # miractl
 
-This repo contains a series of simple Python scripts for controlling Boox Mira e-Ink monitors.
+A simple Python script for controlling Boox Mira e-Ink monitors – both the Boox Mira 13.3" and Boox Mira Pro 25.3" are supported.
 
 ## Dependencies
 
@@ -27,10 +27,10 @@ KERNEL=="hidraw*", ATTRS{idVendor}=="0416", ATTRS{idProduct}=="5020", MODE="0666
 ```
 Finally, reload your udev rules.
 
-`sudo udevadm control --reload-rules && sudo udevadm trigger`
+```
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
 
 ## Usage
 
-Run like any other Python script.
-
-`./mira-refresh.py`
