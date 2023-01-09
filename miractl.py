@@ -22,6 +22,66 @@ refresh_modes = {
     "a2": 3
 }
 
+# Define display modes
+text_mode = {
+    'refresh_mode': 'a2',
+    'contrast': 7,
+    'speed': 6,
+    'dither_mode': 1,
+    'white_filter': 0,
+    'black_filter': 0
+}
+
+speed_mode = {
+    'refresh_mode': 'a2',
+    'contrast': 8,
+    'speed': 7,
+    'dither_mode': 0,
+    'white_filter': 0,
+    'black_filter': 0
+}
+
+image_mode = {
+    'refresh_mode': 'direct',
+    'contrast': 7,
+    'speed': 5,
+    'dither_mode': 0,
+    'white_filter': 0,
+    'black_filter': 0
+}
+
+video_mode = {
+    'refresh_mode': 'a2',
+    'contrast': 7,
+    'speed': 6,
+    'dither_mode': 2,
+    'white_filter': 10,
+    'black_filter': 0
+}
+
+read_mode = {
+    'refresh_mode': 'direct',
+    'contrast': 7,
+    'speed': 5,
+    'dither_mode': 3,
+    'white_filter': 12,
+    'black_filter': 10
+}
+
+# Combine display modes into dict
+display_presets = {
+    'text': text_mode,
+    'speed': speed_mode,
+    'image': image_mode,
+    'video': video_mode,
+    'read': read_mode
+}
+
+def set_display_preset(mode, args):
+    for setting in display_presets[mode]:
+        print('Setting', setting, 'to:', display_presets[mode][setting])
+        setattr(args, setting, display_presets[mode][setting])
+    print(args)
 
 def send_code(dev, code):
     dev.reset()
@@ -40,18 +100,23 @@ def find_devices():
 
     # Find initial Boox Mira device
     dev = usb.core.find(idVendor=VID, idProduct=PID)
-
+    
     # Generate device list
     if dev is not None:
         return usb.core.find(idVendor=VID, idProduct=PID, find_all=True)
     else:
         raise 'No Boox Mira devices found'
 
-
 def parse_args():
     parser = argparse.ArgumentParser(
         prog = 'miractl',
         description = 'A tool for controlling and configuring Boox Mira displays.')
+
+    parser.add_argument('--display-mode',
+                        dest='display_mode',
+                        action='store',
+                        choices=['speed', 'text', 'image', 'video', 'read']
+    )
 
     parser.add_argument('--refresh-mode',
                         dest='refresh_mode',
@@ -126,6 +191,9 @@ def parse_args():
 
 def set_args(args, device_list):
     for dev in device_list:
+        if args.display_mode is not None:
+            set_display_preset(args.display_mode, args)
+
         if args.speed is not None:
             speed_val = 11 - args.speed
             byte_list = [SPEED, speed_val]
