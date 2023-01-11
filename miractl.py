@@ -4,6 +4,7 @@ import argparse
 import usb.core
 import usb.util
 
+
 # Set opcodes
 CLEAR = 1
 REFRESH_MODE = 2
@@ -77,11 +78,13 @@ display_presets = {
     'read': read_mode
 }
 
+
 def set_display_preset(mode, args):
     for setting in display_presets[mode]:
         print('Setting', setting, 'to:', display_presets[mode][setting])
         setattr(args, setting, display_presets[mode][setting])
     print(args)
+
 
 def send_code(dev, code):
     dev.reset()
@@ -106,6 +109,7 @@ def find_devices():
         return usb.core.find(idVendor=VID, idProduct=PID, find_all=True)
     else:
         raise 'No Boox Mira devices found'
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
