@@ -67,7 +67,15 @@ Simple refresh:
 Configure monitor settings:
 
 ```
-./miractl.py [--refresh-mode {direct_update,grey_update,a2}] [--speed [1-7]] [--contrast [0-15]] [--dither-mode [0-3]] [--white-filter [0-254]][--black-filter [0-254]] [--cool-light [0-254]] [--warm-light [0-254]]
+./miractl.py --refresh-mode {direct_update,grey_update,a2}
+             --clear
+             --speed [1-7]
+             --contrast [0-15]
+             --dither-mode [0-3]
+             --white-filter [0-254]
+             --black-filter [0-254]
+             --cool-light [0-254]
+             --warm-light [0-254]
 ```
 
 Any number of settings can be set in a single command, e.g.
@@ -80,4 +88,24 @@ However, `--white-filter` and `--black-filter` must be set together.
 
 ```
 ./miractl.py --white-filter 80 --black-filter 120
+```
+
+## Display modes
+
+There are 5 display modes which can be set using the `--display-mode` flag: `speed`, `text`, `image`, `video` and `read`.
+
+```
+./miractl.py --display-mode text
+```
+
+Since display modes are simply combinations of other flags, the display mode overrides any other settings in your command. For example, in the following command the values for `--contrast` and `--dither-mode` are ignored – the display mode takes precedence.
+
+```
+./miractl.py --display-mode speed --contrast 10 --dither-mode 2
+```
+
+The only exceptions to this are `--cool-light` and `--warm-light`. Display modes never adjust the frontlight, so they can both be configured in a single command.
+
+```
+./miractl.py --display-mode speed --warm-light 110
 ```
