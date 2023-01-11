@@ -81,9 +81,7 @@ display_presets = {
 
 def set_display_preset(mode, args):
     for setting in display_presets[mode]:
-        print('Setting', setting, 'to:', display_presets[mode][setting])
         setattr(args, setting, display_presets[mode][setting])
-    print(args)
 
 
 def send_code(dev, code):
