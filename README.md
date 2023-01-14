@@ -22,7 +22,7 @@ While the script can be run with a simple `./miractl.py [OPTIONS]`, placing it s
 
 ```
 sudo cp ./miractl.py /usr/local/bin/miractl
-sudo chmod 755 /usr/local/bin/miractl
+Sudo chmod 755 /usr/local/bin/miractl
 ```
 
 If you are using linux, you will also need to modify your udev rules.
@@ -68,7 +68,6 @@ Configure monitor settings:
 
 ```
 ./miractl.py --refresh-mode {direct_update,grey_update,a2}
-             --clear
              --speed [1-7]
              --contrast [0-15]
              --dither-mode [0-3]
