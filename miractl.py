@@ -3,7 +3,7 @@
 import argparse
 import usb.core
 import usb.util
-
+import sys
 
 # Set opcodes
 CLEAR = 1
@@ -188,7 +188,8 @@ def parse_args():
                         metavar="[0-254]"
     )
 
-    return parser.parse_args()
+    # Print help message if no arguments are given
+    return parser.parse_args(args=None if sys.argv[1:] else ['--help'])
 
 
 def set_args(args, device_list):
