@@ -4,6 +4,7 @@ import argparse
 import usb.core
 import usb.util
 import sys
+import os
 
 # Set opcodes
 CLEAR = 1
@@ -86,8 +87,10 @@ def set_display_preset(mode, args):
 
 def send_code(dev, code):
     dev.reset()
-    if dev.is_kernel_driver_active(0):
-        dev.detach_kernel_driver(0)
+    # Detaching the kernel driver is not possible (or necessary) on Windows
+    if os.name != 'nt':
+        if dev.is_kernel_driver_active(1):
+            dev.detach_kernel_driver(0)
     dev.set_configuration()
     dev.write(1, code, 0)
 
