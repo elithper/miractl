@@ -1,10 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
-import usb.core
-import usb.util
+import hid
 import sys
-import os
+from time import sleep
+
+# Set vendor and product IDs
+VID = 0x0416
+PID = 0x5020
 
 # Set opcodes
 CLEAR = 1
@@ -31,7 +34,8 @@ text_mode = {
     'speed': 6,
     'dither_mode': 1,
     'white_filter': 0,
-    'black_filter': 0
+    'black_filter': 0,
+    'clear': True
 }
 
 speed_mode = {
@@ -40,16 +44,18 @@ speed_mode = {
     'speed': 7,
     'dither_mode': 0,
     'white_filter': 0,
-    'black_filter': 0
+    'black_filter': 0,
+    'clear': True
 }
 
 image_mode = {
-    'refresh_mode': 'direct',
+    'refresh_mode': 'direct_update',
     'contrast': 7,
     'speed': 5,
     'dither_mode': 0,
     'white_filter': 0,
-    'black_filter': 0
+    'black_filter': 0,
+    'clear': True
 }
 
 video_mode = {
@@ -58,16 +64,18 @@ video_mode = {
     'speed': 6,
     'dither_mode': 2,
     'white_filter': 10,
-    'black_filter': 0
+    'black_filter': 0,
+    'clear': True
 }
 
 read_mode = {
-    'refresh_mode': 'direct',
+    'refresh_mode': 'direct_update',
     'contrast': 7,
     'speed': 5,
     'dither_mode': 3,
     'white_filter': 12,
-    'black_filter': 10
+    'black_filter': 10,
+    'clear': True
 }
 
 # Combine display modes into dict
@@ -86,30 +94,18 @@ def set_display_preset(mode, args):
 
 
 def send_code(dev, code):
-    dev.reset()
-    # Detaching the kernel driver is not possible (or necessary) on Windows
-    if os.name != 'nt':
-        if dev.is_kernel_driver_active(1):
-            dev.detach_kernel_driver(0)
-    dev.set_configuration()
-    dev.write(1, code, 0)
+    dev.write([0] + code)
+    sleep(0.33)
 
 
 def find_devices():
     '''
     Returns all Boox Mira devices.
     '''
-    VID = 0x0416
-    PID = 0x5020
-
-    # Find initial Boox Mira device
-    dev = usb.core.find(idVendor=VID, idProduct=PID)
-    
-    # Generate device list
-    if dev is not None:
-        return usb.core.find(idVendor=VID, idProduct=PID, find_all=True)
+    if hid.enumerate(VID, PID):
+        return hid.enumerate(VID, PID)
     else:
-        raise 'No Boox Mira devices found'
+        raise "No Boox Mira devices found"
 
 
 def parse_args():
@@ -196,46 +192,65 @@ def parse_args():
 
 
 def set_args(args, device_list):
-    for dev in device_list:
+    for device in device_list:
+        dev = hid.device()
+        dev.open(VID, PID, device["serial_number"])
+        dev.set_nonblocking(1)
+
         if args.display_mode is not None:
-            set_display_preset(args.display_mode, args)
+            display_val = args.display_mode
+            set_display_preset(display_val, args)
+            print("Setting display mode to", display_val)
 
         if args.speed is not None:
-            speed_val = 11 - args.speed
-            byte_list = [SPEED, speed_val]
+            speed_val = args.speed
+            byte_list = [SPEED, 11 - args.speed]
             send_code(dev, byte_list)
+            print("Speed set to", speed_val)
 
         if args.contrast is not None:
-            byte_list = [CONTRAST, args.contrast]
+            contrast_val = args.contrast
+            byte_list = [CONTRAST, contrast_val]
             send_code(dev, byte_list)
+            print("Contrast set to", contrast_val)
 
         if args.dither_mode is not None:
-            byte_list = [DITHER_MODE, args.dither_mode]
+            dither_val = args.dither_mode
+            byte_list = [DITHER_MODE, dither_val]
             send_code(dev, byte_list)
+            print("Dither mode set to", dither_val)
 
         if args.refresh_mode is not None:
             mode = refresh_modes[args.refresh_mode]
             byte_list = [REFRESH_MODE, mode]
             send_code(dev, byte_list)
+            print("Refresh mode set to", mode)
 
         if args.cool_light is not None:
-            byte_list = [COOL_LIGHT, args.cool_light]
+            cool_light_val = args.cool_light
+            byte_list = [COOL_LIGHT, cool_light_val]
             send_code(dev, byte_list)
+            print("Cool light set to", cool_light_val)
 
         if args.warm_light is not None:
-            byte_list = [WARM_LIGHT, args.warm_light]
+            warm_light_val = args.warm_light
+            byte_list = [WARM_LIGHT, warm_light_val]
             send_code(dev, byte_list)
+            print("Warm light set to", warm_light_val)
 
         if args.white_filter is not None and args.black_filter is not None:
             white = 255 - args.white_filter
             black = args.black_filter
             byte_list = [COLOUR_FILTER, white, black]
             send_code(dev, byte_list)
+            print("Colour filter set to {0}/{1} (white/black)".format(white, black))
 
         if args.clear:
             byte_list = [CLEAR]
+            print("Clearing screen...")
             send_code(dev, byte_list)
-
+        
+        dev.close()
 
 if __name__ == '__main__':
     set_args(parse_args(), find_devices())
