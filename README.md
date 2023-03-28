@@ -1,30 +1,26 @@
 # miractl
 
-A simple Python script for controlling Boox e-ink monitors – both the Boox Mira 13.3" and Boox Mira Pro 25.3" are supported.
+A simple Python script for controlling Boox e-ink monitors – both the Boox Mira 13.3" and Boox Mira Pro 25.3" are supported. 
 
-The project is inspired by the excellent [mira-js](https://github.com/ipodnerd3019/mira-js) CLI tool.
+The script has been tested on Linux, Mac and Windows using Python 3.11.
+
+This project is inspired by the excellent [mira-js](https://github.com/ipodnerd3019/mira-js) CLI tool.
 
 ## Dependencies
 
-You will need to have python3 installed along with the following module:
+- [Cython](https://github.com/cython/cython)
+- [cython-hidapi](https://github.com/trezor/cython-hidapi)
 
-- `pyusb`
-
-Install the latest official release.
+Install both via `pip`.
 
 ```
-python -m pip install pyusb
+pip install Cython
+pip install hidapi
 ```
-
-### `libusb` on Windows
-
-Since `pyusb` relies on the `libusb` library, you'll need to add this manually on Windows. The library `libusb-1.0.dll` can be obtained from [libusb.info](https://libusb.info) and needs to be placed inside `C:\Windows\System32`.
-
-Additionally, you'll need to make sure the `WinUSB` driver is being used to communicate with the device. Use the USB driver installation tool [Zadig](https://zadig.akeo.ie/) to do this. After selecting _Options > List All Devices_ the device will appear as either _Boox Mira 133_ or _Boox Mira 253_.
 
 ## Setup
 
-While the script can be run with a simple `./miractl.py [OPTIONS]`, placing it somewhere in your $PATH is recommended.
+While the script can be run with a simple `./miractl.py [OPTIONS]`, placing it somewhere in your $PATH is recommended. For example, on Linux/Mac:
 
 ```
 sudo cp ./miractl.py /usr/local/bin/miractl
