@@ -17,7 +17,8 @@ CONTRAST = 5
 COOL_LIGHT = 6
 WARM_LIGHT = 7
 DITHER_MODE = 9
-COLOUR_FILTER = 11
+COLOUR_FILTER = 17
+AUTO_DITHER_MODE = 18
 
 
 # Define refresh modes
@@ -25,6 +26,14 @@ refresh_modes = {
     "direct_update": 1,
     "grey_update": 2,
     "a2": 3
+}
+
+# Define dither modes
+auto_dither_modes = {
+        "disable": [0, 0, 0, 0,],
+        "low": [1, 0, 30, 10],
+        "middle": [1, 0, 40, 10],
+        "high": [1, 0, 50, 30]
 }
 
 # Define display modes
@@ -95,7 +104,7 @@ def set_display_preset(mode, args):
 
 def send_code(dev, code):
     dev.write([0] + code)
-    sleep(0.33)
+    sleep(0.5)
 
 
 def find_devices():
@@ -187,6 +196,12 @@ def parse_args():
                         metavar="[0-254]"
     )
 
+    parser.add_argument('--antiflicker',
+                        dest='auto_dither_mode',
+                        action='store',
+                        choices=['disable', 'low', 'middle', 'high']
+    )
+
     # Print help message if no arguments are given
     return parser.parse_args(args=None if sys.argv[1:] else ['--help'])
 
@@ -202,11 +217,11 @@ def set_args(args, device_list):
             set_display_preset(display_val, args)
             print("Setting display mode to", display_val)
 
-        if args.speed is not None:
-            speed_val = args.speed
-            byte_list = [SPEED, 11 - args.speed]
+        if args.refresh_mode is not None:
+            mode = refresh_modes[args.refresh_mode]
+            byte_list = [REFRESH_MODE, mode]
             send_code(dev, byte_list)
-            print("Speed set to", speed_val)
+            print("Refresh mode set to", mode)
 
         if args.contrast is not None:
             contrast_val = args.contrast
@@ -214,17 +229,17 @@ def set_args(args, device_list):
             send_code(dev, byte_list)
             print("Contrast set to", contrast_val)
 
+        if args.speed is not None:
+            speed_val = args.speed
+            byte_list = [SPEED, 11 - args.speed]
+            send_code(dev, byte_list)
+            print("Speed set to", speed_val)
+
         if args.dither_mode is not None:
             dither_val = args.dither_mode
             byte_list = [DITHER_MODE, dither_val]
             send_code(dev, byte_list)
             print("Dither mode set to", dither_val)
-
-        if args.refresh_mode is not None:
-            mode = refresh_modes[args.refresh_mode]
-            byte_list = [REFRESH_MODE, mode]
-            send_code(dev, byte_list)
-            print("Refresh mode set to", mode)
 
         if args.cool_light is not None:
             cool_light_val = args.cool_light
@@ -244,6 +259,12 @@ def set_args(args, device_list):
             byte_list = [COLOUR_FILTER, white, black]
             send_code(dev, byte_list)
             print("Colour filter set to {0}/{1} (white/black)".format(white, black))
+
+        if args.auto_dither_mode is not None:
+            ad_mode = auto_dither_modes[args.auto_dither_mode]
+            byte_list = [AUTO_DITHER_MODE, ad_mode[0], ad_mode[1], ad_mode[2], ad_mode[3]]
+            send_code(dev, byte_list)
+            print("Antiflicker set to", ad_mode) 
 
         if args.clear:
             byte_list = [CLEAR]
