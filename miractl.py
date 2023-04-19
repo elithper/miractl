@@ -28,9 +28,9 @@ refresh_modes = {
     "a2": 3
 }
 
-# Define dither modes
+# Define autodither (antiflicker) modes
 auto_dither_modes = {
-        "disable": [0, 0, 0, 0,],
+        "disabled": [0, 0, 0, 0,],
         "low": [1, 0, 30, 10],
         "middle": [1, 0, 40, 10],
         "high": [1, 0, 50, 30]
@@ -254,17 +254,18 @@ def set_args(args, device_list):
             print("Warm light set to", warm_light_val)
 
         if args.white_filter is not None and args.black_filter is not None:
-            white = 255 - args.white_filter
+            white = args.white_filter
             black = args.black_filter
-            byte_list = [COLOUR_FILTER, white, black]
+            white_adjusted = 255 - white
+            byte_list = [COLOUR_FILTER, white_adjusted, black]
             send_code(dev, byte_list)
             print("Colour filter set to {0}/{1} (white/black)".format(white, black))
 
         if args.auto_dither_mode is not None:
-            ad_mode = auto_dither_modes[args.auto_dither_mode]
-            byte_list = [AUTO_DITHER_MODE, ad_mode[0], ad_mode[1], ad_mode[2], ad_mode[3]]
+            adm = auto_dither_modes[args.auto_dither_mode]
+            byte_list = [AUTO_DITHER_MODE, adm[0], adm[1], adm[2], adm[3]]
             send_code(dev, byte_list)
-            print("Antiflicker set to", ad_mode) 
+            print("Antiflicker set to", args.auto_dither_mode, adm)
 
         if args.clear:
             byte_list = [CLEAR]
