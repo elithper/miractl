@@ -77,7 +77,7 @@ Configure monitor settings:
              --black-filter [0-254]
              --cool-light [0-254]
              --warm-light [0-254]
-             --antiflicker {disable,low,middle,high}
+             --antiflicker {disabled,low,middle,high}
 ```
 
 Any number of settings can be set in a single command, e.g.
@@ -114,6 +114,6 @@ The only exceptions to this are `--cool-light` and `--warm-light`. Display modes
 
 ## Antiflicker
 
-Setting `--antiflicker` allows you to select the autodithering algorithm used by the display. While there are several options (`off`, `low`, `middle` and `high`), only `high` is recommended.
+Setting `--antiflicker` allows you to select the autodithering algorithm used by the display. While there are several options (`disabled`, `low`, `middle` and `high`), only `high` is recommended.
 
 It is especially important to set this option to `high` on newer ARM-based Macs, which often cause flickering issues otherwise.
