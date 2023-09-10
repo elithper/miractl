@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 import argparse
-import hid
 import sys
 from time import sleep
+
+import hid
 
 # Set vendor and product IDs
 VID = 0x0416
